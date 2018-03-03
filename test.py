@@ -1,8 +1,11 @@
-from hashfile import pass2key
-from hashfile.encrypt import encrypt_file
-from hashfile.decrypt import decrypt_file, decrypt_filestream
+from hashfile.AES.encrypt import encrypt_file
+from hashfile.AES.decrypt import decrypt_file, decrypt_filestream
 
 if __name__ == '__main__':
-    encrypt_file(pass2key(input('Enter a password: ')), 'cred/secrets.yaml')
-    decrypt_file(pass2key(input('Enter your unlock password: ')), 'cred/secrets.yaml.enc')
-    print(decrypt_filestream(pass2key(input('Enter your unlock password: ')), 'cred/secrets.yaml.enc'))
+    encrypt_file('password', 'cred/secrets.yaml')
+
+    decrypt_file('wrong', 'cred/secrets.yaml.enc')
+    decrypt_file('password', 'cred/secrets.yaml.enc')
+
+    print(decrypt_filestream('wrong', 'cred/secrets.yaml.enc'))
+    print(decrypt_filestream('password', 'cred/secrets.yaml.enc'))

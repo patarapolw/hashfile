@@ -5,7 +5,7 @@ import os, struct
 from hashfile import pass2key
 
 
-def encrypt_file(key, in_filename, out_filename=None, chunksize=64*1024):
+def encrypt_file(password, in_filename, out_filename=None, chunksize=64*1024):
     """ Encrypts a file using AES (CBC mode) with the
         given key.
 
@@ -26,6 +26,9 @@ def encrypt_file(key, in_filename, out_filename=None, chunksize=64*1024):
             sizes can be faster for some files and machines.
             chunksize must be divisible by 16.
     """
+    hashed = pass2key(password)
+    key = hashed[:16]
+
     if not out_filename:
         out_filename = in_filename + '.enc'
 
@@ -35,6 +38,8 @@ def encrypt_file(key, in_filename, out_filename=None, chunksize=64*1024):
 
     with open(in_filename, 'rb') as infile:
         with open(out_filename, 'wb') as outfile:
+            outfile.write(hashed)
+
             outfile.write(struct.pack('<Q', filesize))
             outfile.write(iv)
 
@@ -46,4 +51,3 @@ def encrypt_file(key, in_filename, out_filename=None, chunksize=64*1024):
                     chunk += b' ' * (16 - len(chunk) % 16)
 
                 outfile.write(encryptor.encrypt(chunk))
-
