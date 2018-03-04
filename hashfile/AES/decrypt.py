@@ -1,15 +1,16 @@
 from __future__ import print_function
 import os, struct
 from Crypto.Cipher import AES
-
 import bcrypt
+
+from hashfile import pass2key
 
 
 def decrypt_filestream(password, in_filename, chunksize=24*1024):
     stream = bytes()
     with open(in_filename, 'rb') as infile:
         hashed = infile.read(60)
-        key = hashed[:16]
+        key = pass2key(password)
         if not bcrypt.checkpw(password.encode(), hashed):
             print('Wrong password')
             return False
@@ -42,14 +43,14 @@ def decrypt_file(password, in_filename, out_filename=None, chunksize=24*1024):
 
     with open(in_filename, 'rb') as infile:
         hashed = infile.read(60)
-        key = hashed[:16]
+        key = pass2key(password)
         if not bcrypt.checkpw(password.encode(), hashed):
             print('Wrong password')
             return False
 
         origsize = struct.unpack('<Q', infile.read(struct.calcsize('Q')))[0]
         iv = infile.read(16)
-        decryptor = AES.new(key[:16], AES.MODE_CBC, iv)
+        decryptor = AES.new(key, AES.MODE_CBC, iv)
 
         with open(out_filename, 'wb') as outfile:
             while True:

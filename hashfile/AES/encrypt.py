@@ -3,6 +3,7 @@ from Crypto import Random
 import os, struct
 
 from hashfile import pass2key
+import bcrypt
 
 
 def encrypt_file(password, in_filename, out_filename=None, chunksize=64*1024):
@@ -26,8 +27,8 @@ def encrypt_file(password, in_filename, out_filename=None, chunksize=64*1024):
             sizes can be faster for some files and machines.
             chunksize must be divisible by 16.
     """
-    hashed = pass2key(password)
-    key = hashed[:16]
+    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+    key = pass2key(password)
 
     if not out_filename:
         out_filename = in_filename + '.enc'
